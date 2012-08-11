@@ -1,13 +1,13 @@
-/* tg_wolfie 
+/* tg_wolfie
 *
 *  Wolfie interfaces to a current sensor and reports
 *  current readings via serial port polling.  It is expected that
 *  an Xbee is attached to the serial port */
 
-#define NUMBER_OF_SAMPLES 10
+#define NUMBER_OF_SAMPLES 16
 
-int sampleI;
-double sumI, Irms; 
+int sampleV;
+double sumV, Vrms;
 long  previousMillis;
 
 // the setup routine runs once when you press reset:
@@ -22,7 +22,7 @@ void setup() {
 
 // the loop routine runs over and over again forever:
 void loop() {
-  
+
   unsigned long currentMillis = millis();
   double voltage;
   while( Serial.available()>0)
@@ -32,7 +32,7 @@ void loop() {
    delay(1);  // needed to allow next char to be received. It takes 173.6 us per char
    char ch = Serial.read();
    // do an address check, flush and quit if no match
-   if (ch != 0x38) 
+   if (ch != 0x38)
       {
       Serial.flush();
       cmnd = 0;           // force a bailout
@@ -40,25 +40,27 @@ void loop() {
    switch (cmnd)
    {
    case '?':
-     
+
         voltage = getSample();
         Serial.print("!8");
         // Serial.println(voltage, DEC);
-        if (voltage > 100) 
+        if (voltage > 25)
            Serial.println("1");
-        else 
+        else
            Serial.println("0");
       break;
     case '#':
         voltage = getSample();
         Serial.print("!8V");
         Serial.println(voltage, DEC);
-       
+
       break;
+    default:
+    	break;
     }
-    
+
   Serial.flush();
-  
+
   }
 }
 
@@ -71,14 +73,14 @@ double getSample(void)
 {
    for (int n = 0; n < NUMBER_OF_SAMPLES; n++)
   {
-      sampleI = analogRead(A0);
-      delay(2);
-      sumI += sampleI;
-      
+      sampleV = analogRead(A0);
+      delay(1);
+      sumV += sampleV;
+
   }
-  Irms = sumI/(NUMBER_OF_SAMPLES);
-  sumI = 0;
-  return Irms;
+  Vrms = sumV/(NUMBER_OF_SAMPLES);
+  sumV = 0;
+  return Vrms;
   }
-  
+
 
