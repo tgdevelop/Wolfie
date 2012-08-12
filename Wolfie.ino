@@ -44,7 +44,7 @@ void loop() {
         voltage = getSample();
         Serial.print("!8");
         // Serial.println(voltage, DEC);
-        if (voltage > 25)
+        if (voltage > 0)
            Serial.println("1");
         else
            Serial.println("0");
